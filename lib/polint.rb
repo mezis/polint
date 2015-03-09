@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'polint/version'
 require 'singleton'
 
@@ -51,19 +52,25 @@ module Polint
       success or die "The PO file '#{@pofile}' is broken, aborting."
     end
 
-    # Load the PO file, annotate keys with line numbers, and unwrap lines.
+    # Load the PO file, annotate keys with original line numbers, and unwrap lines.
     def annotate_and_load_po
       data = []
+      header_seen = false
       File.open(@pofile).each_with_index do |line,index|
-        if line =~ /^msgid\s+"(.*)"$/ && index > 1
-          data << %Q{msgid "#{index+1}:#{$1}"}
+        if line =~ /^msgid\s+"(.*)"$/
+          if header_seen
+            data << %Q{msgid "#{index+1}:#{$1}"\n}
+          else
+            data << line
+            header_seen = true
+          end
         else
           data << line
         end
       end
 
       IO.popen("msgcat --no-wrap -",'r+') do |io|
-        io.write data.join("\n")
+        io.write data.join
         io.flush
         io.close_write
         data = io.read.split(/\n/)
