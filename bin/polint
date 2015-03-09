@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+#
+#  Sanity checks on PO files
+#
+require 'rubygems'
+require 'term/ansicolor'
+require 'polint'
+
+ARGV.each do |arg|
+  Polint::Checker.new(arg).run
+end

@@ -1,6 +1,6 @@
 # Polint
 
-TODO: Write a gem description
+A linter for Uniforum PO files.
 
 ## Installation
 
@@ -20,11 +20,17 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Run:
+
+    $ polint file.po ...
+
+Exit status will be non-zero if any issues are encountered.
+
+Details about the issues will be listed on standard output.
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/polint/fork )
+1. Fork it ( https://github.com/mezis/polint/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
