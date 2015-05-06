@@ -6,6 +6,6 @@ require 'rubygems'
 require 'term/ansicolor'
 require 'polint'
 
-ARGV.each do |arg|
-  Polint::Checker.new(arg).run
-end
+errors = ARGV.map { |arg| Polint::Checker.new(arg).run }.reduce(&:+)
+exit (errors > 0) ? 1 : 0
+
