@@ -12,7 +12,11 @@ module Polint
   end
 
   class Checker
-    AttributeRe = /%\{[^\}]+\}/
+    AttributeRe = /
+      %\{ [^\}]+ \}  |     # Ruby Gettext
+      %\( [^\)]+ \)[sd] |  # Javascript sprintf
+      \{\{ [^\}] \}\}      # Liquid
+    /x
     TA = Term::ANSIColor
 
     def initialize(pofile)
