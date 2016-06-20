@@ -1,5 +1,6 @@
 # coding: utf-8
 require 'polint/version'
+require 'term/ansicolor'
 require 'singleton'
 
 module Polint
@@ -84,12 +85,19 @@ module Polint
     end
 
     def parse_data(lines)
-      current = []
       context = []
+      msgid = nil
+      msgid_plural = nil
+      plural_attr = nil
       next_is_fuzzy = false
+      msgstr_plurals = 0
+      nplurals = 0
 
       lines.each do |line|
         case line
+
+        when /^"Plural-Forms:.+nplurals=([0-9]+)/
+          nplurals = $1.to_i
 
         when /^#, fuzzy/
           next_is_fuzzy = true
@@ -97,18 +105,42 @@ module Polint
         when /^#: (.*)/
           context << $1
 
-        when /^(msgid|msgid_plural)\s+"(.*)"$/
-          current << $2
+        when /^msgid\s+"(.*)"$/
+          msgid = $1
 
-        when /^(msgstr(?:\[([01])\])?)\s+"(.*)"$/
-          index = $2.to_i # $2 will be nil for non-plural, so index will be 0
-          check_pair(current[index], $3, context, next_is_fuzzy)
+        when /^msgid_plural\s+"(.*)"$/
+          msgid_plural = $1
+          plural_attr = (msgid_plural.scan(AttributeRe).uniq - msgid.scan(AttributeRe).uniq).first
+
+        when /^msgstr\s+"(.*)"$/
+          check_pair(msgid, $1, context, next_is_fuzzy)
+
+        when /^msgstr\[[0-9]+\]\s+"(.*)"$/
+          val = $1
+          msgid_check = val.scan(AttributeRe).include?(plural_attr) ? msgid_plural : msgid
+          check_pair(msgid_check, val, context, next_is_fuzzy)
+          msgstr_plurals += 1
 
         else
-          current = []
+          if msgid_plural && msgstr_plurals != nplurals
+            @errors += 1
+            # TODO: file/line context in message
+            puts "#{term.red} Error: #{msgstr_plurals} plurals found but #{nplurals} required.#{term.clear}"
+          end
+
           context = []
+          msgid = nil
+          msgid_plural = nil
+          plural_attr = nil
           next_is_fuzzy = false
+          msgstr_plurals = 0
         end
+      end
+
+      if msgid_plural && msgstr_plurals != nplurals
+        @errors += 1
+        # TODO: file/line context in message
+        puts "#{term.red} Error: #{msgstr_plurals} plurals found but #{nplurals} required.#{term.clear}"
       end
     end
 
