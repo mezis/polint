@@ -115,6 +115,8 @@ module Polint
     end
 
     def parse_data(data)
+      return if data.nil? || data.empty?
+
       tree = Polint::Parser.new.parse(data)
       tree = Polint::Transform.new.apply(tree)
 
