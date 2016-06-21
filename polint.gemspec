@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard-rspec"
 
   spec.add_dependency "term-ansicolor"
+  spec.add_dependency "parslet", "~> 1.7", ">= 1.7.1"
 end

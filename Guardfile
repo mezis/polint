@@ -9,4 +9,6 @@ guard :rspec, cmd: "bundle exec rspec" do
 
   ruby = dsl.ruby
   dsl.watch_spec_files_for(ruby.lib_files)
+
+  watch(%r{^spec/data/.*\.po}) { 'spec/lib/polint_spec.rb' }
 end

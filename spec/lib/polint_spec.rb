@@ -2,7 +2,7 @@ require 'polint'
 
 RSpec.describe Polint::Checker do
 
-  Dir.glob(File.join(__dir__, '..', 'data', '*.po')) do |file|
+  Dir.glob(File.join(__dir__, '..', 'data', '*-valid.po')) do |file|
     context "#{File.basename(file, '.po').split('-').join(' ')}" do
       let(:checker) { described_class.new(file) }
 

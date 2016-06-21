@@ -9,6 +9,10 @@ msgstr ""
 
 #: ../some_file.rb:51
 msgid "Hello World"
-msgid_plural "Hello %{n} Worlds"
-msgstr[0] "Hello World"
-msgstr[1] "Hello %{n} Worlds"
+msgstr "Hello World"
+
+#: ../some_file.rb:51
+msgid "Hello World Plural"
+msgid_plural "Hello %{n} Worlds Plural"
+msgstr[0] "Hello World Plural"
+msgstr[1] "Hello %{n} Worlds Plural"
