@@ -6,8 +6,8 @@ require 'polint/version'
 Gem::Specification.new do |spec|
   spec.name          = "polint"
   spec.version       = Polint::VERSION
-  spec.authors       = ["Julien Letessier"]
-  spec.email         = ["julien.letessier@gmail.com"]
+  spec.authors       = ["Julien Letessier", "Greg Beech"]
+  spec.email         = ["julien.letessier@gmail.com", "greg@gregbeech.com"]
   spec.summary       = %q{A linter for Uniforum PO files.}
   spec.homepage      = ""
   spec.license       = "MIT"
