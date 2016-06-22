@@ -89,6 +89,30 @@ RSpec.describe Polint::Parser do
     end
   end
 
+  describe 'rule(:unparsed_comment)' do
+    let(:rule) { :unparsed_comment }
+
+    context 'when matching a translator comment' do
+      let(:line) { '# no semantics here' }
+      it { expect(tree).to eq comment: ' no semantics here' }
+    end
+
+    context 'when matching an extracted comment' do
+      let(:line) { '#. no semantics here' }
+      it { expect(tree).to eq comment: '. no semantics here' }
+    end
+
+    context 'when matching a previous translation comment' do
+      let(:line) { '#| no semantics here' }
+      it { expect(tree).to eq comment: '| no semantics here' }
+    end
+
+    context 'when matching an obsolete translation' do
+      let(:line) { '#~ obsolete things go here' }
+      it { expect{ tree }.to raise_error Parslet::ParseFailed }
+    end
+  end
+
   describe 'rule(:msgid)' do
     let(:rule) { :msgid }
 
@@ -251,6 +275,23 @@ RSpec.describe Polint::Parser do
             ]
           }
         ]
+      }
+    end
+  end
+
+  describe 'rule(:obsolete_translation)' do
+    let(:rule) { :obsolete_translation }
+    let(:line) { lines.join("\n") }
+
+    context 'when matching a singular single-line msgstr with comments' do
+      let(:lines) {
+        [
+          '#~ msgid "Hello World"',
+          '#~ msgstr "Hello World"'
+        ]
+      }
+      it {
+        expect(tree).to eq obsolete_translation: line
       }
     end
   end

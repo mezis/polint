@@ -16,12 +16,12 @@ module Polint
       { headers: items.to_h }
     end
 
-    rule(msgid: sequence(:items)) { { msgid: { text: items.join("\n") } } }
-    rule(msgid_plural: sequence(:items)) { { msgid_plural: { text: items.join("\n") } } }
+    rule(msgid: sequence(:items)) { { msgid: { text: items.join } } }
+    rule(msgid_plural: sequence(:items)) { { msgid_plural: { text: items.join } } }
     rule(msgstr: subtree(:items)) do
       msgstr = {}
       msgstr[:index] = items.shift[:index].to_i if items.first.is_a?(Hash)
-      msgstr[:text] = items.join("\n")
+      msgstr[:text] = items.join
       { msgstr: msgstr }
     end
 
@@ -29,6 +29,7 @@ module Polint
       translation = {
         flags: [],
         references: [],
+        comments: [],
         msgid: {},
         msgid_plural: {},
         msgstrs: []
@@ -38,6 +39,7 @@ module Polint
         case k
         when :flags then translation[:flags] |= v
         when :reference then translation[:references] << v
+        when :comment then translation[:comments] << v
         when :msgid, :msgid_plural then translation[k] = v
         when :msgstr then translation[:msgstrs] << v
         end

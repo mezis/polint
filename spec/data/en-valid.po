@@ -16,3 +16,9 @@ msgid "Hello World Plural"
 msgid_plural "Hello %{n} Worlds Plural"
 msgstr[0] "Hello World Plural"
 msgstr[1] "Hello %{n} Worlds Plural"
+
+#~ msgid "Obsolete Translation"
+#~ msgstr "Obsolete Translation"
+
+#~ msgid "Another Obsolete Translation"
+#~ msgstr "Another Obsolete Translation"
