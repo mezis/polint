@@ -37,10 +37,11 @@ RSpec.describe Polint::Transform do
           { flags: [{ flag: 'fuzzy' }] },
           { reference: '../../some_file.rb:34' },
           { reference: '../../some_other_file.rb:283' },
-          { msgid: [{ quoted_string: [] }, { quoted_string: 'Hello World' }, { quoted_string: 'Hello Again'}] },
-          { msgid_plural: [{ quoted_string: [] }, { quoted_string: 'Hello %{n} Worlds' }, { quoted_string: 'Hello Again'}] },
-          { msgstr: [{ index: '0' }, { quoted_string: [] }, { quoted_string: 'Hello World' }, { quoted_string: 'Hello Again'}] },
-          { msgstr: [{ index: '1' }, { quoted_string: [] }, { quoted_string: 'Hello %{n} Worlds' }, { quoted_string: 'Hello Again'}] }
+          { comment: 'arbitrary text' },
+          { msgid: [{ quoted_string: [] }, { quoted_string: 'Hello World\\n' }, { quoted_string: 'Hello Again'}] },
+          { msgid_plural: [{ quoted_string: [] }, { quoted_string: 'Hello %{n} Worlds\\n' }, { quoted_string: 'Hello Again'}] },
+          { msgstr: [{ index: '0' }, { quoted_string: [] }, { quoted_string: 'Hello World\\n' }, { quoted_string: 'Hello Again'}] },
+          { msgstr: [{ index: '1' }, { quoted_string: [] }, { quoted_string: 'Hello %{n} Worlds\\n' }, { quoted_string: 'Hello Again'}] }
         ]
       }
     }
@@ -48,11 +49,12 @@ RSpec.describe Polint::Transform do
       expect(output).to eq translation: {
         flags: [:fuzzy],
         references: ['../../some_file.rb:34', '../../some_other_file.rb:283'],
-        msgid: { text: "\nHello World\nHello Again" },
-        msgid_plural: { text: "\nHello %{n} Worlds\nHello Again" },
+        comments: ['arbitrary text'],
+        msgid: { text: 'Hello World\\nHello Again' },
+        msgid_plural: { text: 'Hello %{n} Worlds\\nHello Again' },
         msgstrs: [
-          { index: 0, text: "\nHello World\nHello Again" },
-          { index: 1, text: "\nHello %{n} Worlds\nHello Again" }
+          { index: 0, text: 'Hello World\\nHello Again' },
+          { index: 1, text: 'Hello %{n} Worlds\\nHello Again' }
         ]
       }
     }

@@ -33,7 +33,8 @@ module Polint
     rule(:flag) { str(',') >> lwsp >> match(/[a-z\-]/).repeat(1).as(:flag) >> lwsp }
     rule(:flag_comment) { start_comment >> flag.repeat(1).as(:flags) >> endl }
     rule(:reference_comment) { start_comment >> str(':') >> lwsp >> match(/[^\n]/).repeat.as(:reference) >> endl }
-    rule(:comment) { flag_comment | reference_comment }
+    rule(:unparsed_comment) { start_comment >> lwsp >> match(/[^\n]/).repeat.as(:comment) >> endl }
+    rule(:comment) { flag_comment | reference_comment | unparsed_comment }
     rule(:comments) { comment.repeat }
 
     rule(:msgid) { str('msgid') >> lwsp >> quoted_strings.as(:msgid) }

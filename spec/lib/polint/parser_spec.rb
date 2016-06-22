@@ -89,6 +89,15 @@ RSpec.describe Polint::Parser do
     end
   end
 
+  describe 'rule(:unparsed_comment)' do
+    let(:rule) { :unparsed_comment }
+
+    context 'when matching any comment' do
+      let(:line) { '# no semantics here' }
+      it { expect(tree).to eq comment: 'no semantics here' }
+    end
+  end
+
   describe 'rule(:msgid)' do
     let(:rule) { :msgid }
 
