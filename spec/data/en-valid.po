@@ -1,0 +1,18 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: PhraseApp (phraseapp.com)\n"
+
+#: ../some_file.rb:51
+msgid "Hello World"
+msgstr "Hello World"
+
+#: ../some_file.rb:51
+msgid "Hello World Plural"
+msgid_plural "Hello %{n} Worlds Plural"
+msgstr[0] "Hello World Plural"
+msgstr[1] "Hello %{n} Worlds Plural"

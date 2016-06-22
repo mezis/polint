@@ -1,5 +1,8 @@
 # coding: utf-8
 require 'polint/version'
+require 'polint/parser'
+require 'polint/transform'
+require 'term/ansicolor'
 require 'singleton'
 
 module Polint
@@ -37,6 +40,34 @@ module Polint
     end
 
   private
+
+    def error(key, val, contexts, message)
+      log key, val, contexts, "Error: #{message}", :red
+    end
+
+    def warn(key, val, contexts, message)
+      log key, val, contexts, "Warning: #{message}", :yellow
+    end
+
+    def log(key, val, contexts, message, color)
+      if key =~ /(\d+):(.*)/
+        lineno = $1
+        file_and_line = "#{@pofile}:#{$1}:"
+        key = $2
+      else
+        lineno = nil
+        file_and_line = "#{@pofile}:"
+      end
+      puts "#{file_and_line}#{term.public_send(color)} #{message}.#{term.clear}"
+      if @verbose
+        contexts.each do |context|
+          puts "#{term.blue}CONTEXT:#{term.clear} #{context}"
+        end
+        puts "#{term.blue}KEY:#{term.clear} #{key}"
+        puts "#{term.blue}TRN:#{term.clear} #{val}"
+        puts "–" * 80
+      end
+    end
 
     def term
       @term ||= ENV['NOCOLOR'] ? BlackHole.instance : Term::ANSIColor
@@ -77,39 +108,49 @@ module Polint
         io.write data.join
         io.flush
         io.close_write
-        data = io.read.split(/\n/)
+        data = io.read
       end
       success and return data
       die "Error while loading the PO file '#{@pofile}', aborting."
     end
 
-    def parse_data(lines)
-      current = []
-      context = []
-      next_is_fuzzy = false
+    def parse_data(data)
+      return if data.nil? || data.empty?
 
-      lines.each do |line|
-        case line
+      tree = Polint::Parser.new.parse(data)
+      tree = Polint::Transform.new.apply(tree)
 
-        when /^#, fuzzy/
-          next_is_fuzzy = true
+      die 'No Plural-Forms header found' unless tree[:headers].key?('Plural-Forms')
+      nplurals = tree[:headers]['Plural-Forms'][:nplurals]
 
-        when /^#: (.*)/
-          context << $1
+      tree[:translations].each do |translation|
+        msgid, msgid_plural = translation[:msgid][:text], translation[:msgid_plural][:text]
+        contexts = translation[:references]
+        fuzzy = translation[:flags].include?(:fuzzy)
 
-        when /^(msgid|msgid_plural)\s+"(.*)"$/
-          current << $2
+        if msgid_plural.nil?
+          if translation[:msgstrs].size != 1
+            error msgid, nil, contexts, "#{translation[:msgstrs].size} plurals found but none expected"
+            @errors += 1
+          end
 
-        when /^(msgstr(?:\[([01])\])?)\s+"(.*)"$/
-          index = $2.to_i # $2 will be nil for non-plural, so index will be 0
-          check_pair(current[index], $3, context, next_is_fuzzy)
-
+          check_pair(msgid, translation[:msgstrs][0][:text], translation[:references], fuzzy)
         else
-          current = []
-          context = []
-          next_is_fuzzy = false
+          if translation[:msgstrs].size != nplurals
+            error msgid, nil, contexts, "#{translation[:msgstrs].size} plurals found but #{nplurals} expected"
+            @errors += 1
+          end
+
+          plural_attr = (msgid_plural.scan(AttributeRe).uniq - msgid.scan(AttributeRe).uniq).first
+          translation[:msgstrs].each do |msgstr|
+            val = msgstr[:text]
+            msgid_check = val.scan(AttributeRe).include?(plural_attr) ? msgid_plural : msgid
+            check_pair(msgid_check, val, contexts, fuzzy)
+          end
         end
       end
+    rescue Parslet::ParseFailed => e
+      die e.cause.ascii_tree
     end
 
     # Check for errors in a key/translation pair.
@@ -129,36 +170,18 @@ module Polint
       @errors  += 1 if not_in_val.any? || not_in_key.any? || is_empty
       @fuzzies += 1 if is_fuzzy
 
-      if key =~ /(\d+):(.*)/
-        lineno = $1
-        file_and_line = "#{@pofile}:#{$1}:"
-        key = $2
-      else
-        lineno = nil
-        file_and_line = "#{@pofile}:"
-      end
-
       if is_empty
-        puts "#{file_and_line}#{term.red} Error: translated string empty.#{term.clear}"
+        error key, val, contexts, "translated string empty"
       elsif not_in_key.any?
         not_in_key.each do |name|
-          puts "#{file_and_line}#{term.red} Error: #{name} absent from reference string.#{term.clear}"
+          error key, val, contexts, "#{name} absent from reference string"
         end
       elsif not_in_val.any?
         not_in_val.each do |name|
-          puts "#{file_and_line}#{term.yellow} Warning: #{name} absent from translated string.#{term.clear}"
+          warn key, val, contexts, "#{name} absent from translated string"
         end
       elsif is_fuzzy
-        puts "#{file_and_line}#{term.yellow} Warning: translation is fuzzy.#{term.clear}"
-      end
-
-      if @verbose
-        contexts.each do |context|
-          puts "#{term.blue}CONTEXT:#{term.clear} #{context}"
-        end
-        puts "#{term.blue}KEY:#{term.clear} #{key}"
-        puts "#{term.blue}TRN:#{term.clear} #{val}"
-        puts "–" * 80
+        warn key, val, contexts, "translation is fuzzy"
       end
     end
   end

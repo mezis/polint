@@ -6,8 +6,8 @@ require 'polint/version'
 Gem::Specification.new do |spec|
   spec.name          = "polint"
   spec.version       = Polint::VERSION
-  spec.authors       = ["Julien Letessier"]
-  spec.email         = ["julien.letessier@gmail.com"]
+  spec.authors       = ["Julien Letessier", "Greg Beech"]
+  spec.email         = ["julien.letessier@gmail.com", "greg@gregbeech.com"]
   spec.summary       = %q{A linter for Uniforum PO files.}
   spec.homepage      = ""
   spec.license       = "MIT"
@@ -19,7 +19,9 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.7"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-byebug"
+  spec.add_development_dependency "guard-rspec"
 
   spec.add_dependency "term-ansicolor"
+  spec.add_dependency "parslet", "~> 1.7", ">= 1.7.1"
 end
