@@ -120,7 +120,7 @@ module Polint
       tree = Polint::Parser.new.parse(data)
       tree = Polint::Transform.new.apply(tree)
 
-      die 'No Plural-Forms header found' unless tree[:headers].key?('Plural-Forms')
+      die "The PO file '#{@pofile}' has no Plural-Forms header, aborting." unless tree[:headers].key?('Plural-Forms')
       nplurals = tree[:headers]['Plural-Forms'][:nplurals]
 
       tree[:translations].each do |translation|
@@ -150,7 +150,7 @@ module Polint
         end
       end
     rescue Parslet::ParseFailed => e
-      die e.cause.ascii_tree
+      die "The PO file '#{@pofile}' cannot be parsed, aborting.\n\n#{e.cause.ascii_tree}"
     end
 
     # Check for errors in a key/translation pair.
