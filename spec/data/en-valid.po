@@ -17,6 +17,7 @@ msgid_plural "Hello %{n} Worlds Plural"
 msgstr[0] "Hello World Plural"
 msgstr[1] "Hello %{n} Worlds Plural"
 
+# comment on obsolete translation
 #~ msgid "Obsolete Translation"
 #~ msgstr "Obsolete Translation"
 
