@@ -33,7 +33,7 @@ module Polint
     rule(:flag) { str(',') >> lwsp >> match(/[a-z\-]/).repeat(1).as(:flag) >> lwsp }
     rule(:flag_comment) { start_comment >> flag.repeat(1).as(:flags) >> endl }
     rule(:reference_comment) { start_comment >> str(':') >> lwsp >> match(/[^\n]/).repeat.as(:reference) >> endl }
-    rule(:unparsed_comment) { start_comment >> (match(/[^~]/) >> lwsp >> match(/[^\n]/).repeat).as(:comment) >> endl }
+    rule(:unparsed_comment) { start_comment >> match(/[^~]/) >> lwsp >> match(/[^\n]/).repeat.as(:comment) >> endl }
     rule(:comment) { flag_comment | reference_comment | unparsed_comment }
     rule(:comments) { comment.repeat }
 
@@ -47,7 +47,7 @@ module Polint
     rule(:translations) { translation.repeat }
 
     rule(:obsolete_line) { start_comment >> str('~') >> lwsp >> match(/[^\n]/).repeat >> endl }
-    rule(:obsolete_translation) { obsolete_line.repeat(1).as(:obsolete_translation) >> blank_line }
+    rule(:obsolete_translation) { (comment.repeat >> obsolete_line.repeat(1).as(:text)).as(:obsolete_translation) >> blank_line }
     rule(:obsolete_translations) { obsolete_translation.repeat }
 
     rule(:file) { (headers >> translations >> obsolete_translations).as(:file) }

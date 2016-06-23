@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    polint (0.2.1)
+    polint (0.2.2)
       parslet (~> 1.7, >= 1.7.1)
       term-ansicolor
 
