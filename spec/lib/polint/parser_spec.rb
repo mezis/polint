@@ -231,6 +231,25 @@ RSpec.describe Polint::Parser do
       }
     end
 
+    context 'when matching without comments' do
+      let(:lines) {
+        [
+          'msgid "Hello World"',
+          'msgid_plural "Hello %{n} Worlds"',
+          'msgstr[0] "Hello World"',
+          'msgstr[1] "Hello %{n} Worlds"'
+        ]
+      }
+      it {
+        expect(tree).to eq translation: [
+          { msgid: [{ quoted_string: 'Hello World' }] },
+          { msgid_plural: [{ quoted_string: 'Hello %{n} Worlds' }] },
+          { msgstr: [{ index: '0' }, { quoted_string: 'Hello World' }] },
+          { msgstr: [{ index: '1' }, { quoted_string: 'Hello %{n} Worlds' }] }
+        ]
+      }
+    end
+
     # TODO: Multiline strings and negative cases
   end
 

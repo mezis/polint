@@ -43,7 +43,7 @@ module Polint
     rule(:index) { str('[') >> match(/[0-9]/).repeat(1).as(:index) >> str(']') }
     rule(:msgstr) { str('msgstr') >> (index.maybe >> lwsp >> quoted_strings).as(:msgstr) }
 
-    rule(:translation) { (comments >> msgid >> msgid_plural.maybe >> msgstr.repeat(1)).as(:translation) >> blank_line }
+    rule(:translation) { (comments >> msgid >> msgid_plural.repeat(0, 1) >> msgstr.repeat(1)).as(:translation) >> blank_line }
     rule(:translations) { translation.repeat }
 
     rule(:obsolete_line) { start_comment >> str('~') >> lwsp >> match(/[^\n]/).repeat >> endl }
