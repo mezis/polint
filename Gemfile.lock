@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    polint (0.2.2)
+    polint (0.2.3)
       parslet (~> 1.8)
       term-ansicolor
 
@@ -79,4 +79,4 @@ DEPENDENCIES
   rake (~> 13.0)
 
 BUNDLED WITH
-   2.3.19
+   2.3.6
